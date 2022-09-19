@@ -36,13 +36,13 @@ class ScanPresenter constructor(private val context: Context, private val iView:
     : SurfaceHolder.Callback, Camera.PictureCallback, Camera.PreviewCallback {
     private val TAG: String = "ScanPresenter"
     private var mCamera: Camera? = null
-    private val mSurfaceHolder: SurfaceHolder = iView.getSurfaceView().holder
+//    private val mSurfaceHolder: SurfaceHolder = iView.getSurfaceView().holder
     private val executor: ExecutorService
     private val proxySchedule: Scheduler
     private var busy: Boolean = false
 
     init {
-        mSurfaceHolder.addCallback(this)
+//        mSurfaceHolder.addCallback(this)
         executor = Executors.newSingleThreadExecutor()
         proxySchedule = Schedulers.from(executor)
     }
@@ -70,7 +70,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
         }
         mCamera?.stopPreview()
         try {
-            mCamera?.setPreviewDisplay(mSurfaceHolder)
+//            mCamera?.setPreviewDisplay(mSurfaceHolder)
         } catch (e: IOException) {
             e.printStackTrace()
             return
@@ -100,9 +100,9 @@ class ScanPresenter constructor(private val context: Context, private val iView:
         val displayRatio = displayWidth.div(displayHeight.toFloat())
         val previewRatio = size?.height?.toFloat()?.div(size.width.toFloat()) ?: displayRatio
         if (displayRatio > previewRatio) {
-            val surfaceParams = iView.getSurfaceView().layoutParams
-            surfaceParams.height = (displayHeight / displayRatio * previewRatio).toInt()
-            iView.getSurfaceView().layoutParams = surfaceParams
+//            val surfaceParams = iView.getSurfaceView().layoutParams
+//            surfaceParams.height = (displayHeight / displayRatio * previewRatio).toInt()
+//            iView.getSurfaceView().layoutParams = surfaceParams
         }
 
         val supportPicSize = mCamera?.parameters?.supportedPictureSizes
@@ -132,6 +132,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
     }
 
     fun detectEdge(pic: Mat) {
+        Log.d("MY_LOG","detectEdge")
         SourceManager.corners = processPicture(pic)
         Imgproc.cvtColor(pic, pic, Imgproc.COLOR_RGB2BGRA)
         SourceManager.pic = pic
@@ -169,7 +170,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
                     Core.rotate(pic, pic, Core.ROTATE_90_CLOCKWISE)
                     mat.release()
 
-                    detectEdge(pic);
+//                    detectEdge(pic);
                     busy = false
                 }
     }
@@ -178,6 +179,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
         if (busy) {
             return
         }
+        Log.d("MY_LOG","onPreviewFrame")
         Log.i(TAG, "on process start")
         busy = true
         Observable.just(p0)
@@ -194,8 +196,11 @@ class ScanPresenter constructor(private val context: Context, private val iView:
                     val bytes = out.toByteArray()
                     val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 
+                    Log.d("MY_LOG","bitmap! : ${bitmap.width}, ${bitmap.height}")
+
                     val img = Mat()
                     Utils.bitmapToMat(bitmap, img)
+                    Log.d("MY_LOG","mat! : ${img.width()}, ${img.height()}")
                     bitmap.recycle()
                     Core.rotate(img, img, Core.ROTATE_90_CLOCKWISE)
                     try {
@@ -205,6 +210,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
                     }
 
                     Observable.create<Corners> {
+                        Log.d("MY_LOG","processPic")
                         val corner = processPicture(img)
                         busy = false
                         if (null != corner && corner.corners.size == 4) {

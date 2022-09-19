@@ -5,10 +5,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <SurfaceView
-        android:id="@+id/surface"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+<!--    <SurfaceView-->
+<!--        android:id="@+id/surface"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" />-->
 
     <com.pengke.paper.scanner.view.PaperRectangle
         android:id="@+id/paper_rect"

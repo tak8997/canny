@@ -5,6 +5,8 @@ import android.util.Log
 import org.opencv.android.Utils
 import org.opencv.core.*
 import org.opencv.imgproc.Imgproc
+import java.util.*
+
 
 const val TAG: String = "PaperProcessor"
 
@@ -56,7 +58,15 @@ fun enhancePicture(src: Bitmap?): Bitmap {
     val src_mat = Mat()
     Utils.bitmapToMat(src, src_mat)
     Imgproc.cvtColor(src_mat, src_mat, Imgproc.COLOR_RGBA2GRAY)
-    Imgproc.adaptiveThreshold(src_mat, src_mat, 255.0, Imgproc.ADAPTIVE_THRESH_MEAN_C, Imgproc.THRESH_BINARY, 15, 15.0)
+    Imgproc.adaptiveThreshold(
+        src_mat,
+        src_mat,
+        255.0,
+        Imgproc.ADAPTIVE_THRESH_MEAN_C,
+        Imgproc.THRESH_BINARY,
+        15,
+        15.0
+    )
     val result = Bitmap.createBitmap(src?.width ?: 1080, src?.height ?: 1920, Bitmap.Config.RGB_565)
     Utils.matToBitmap(src_mat, result, true)
     src_mat.release()
@@ -64,7 +74,7 @@ fun enhancePicture(src: Bitmap?): Bitmap {
 }
 
 private fun findContours(src: Mat): ArrayList<MatOfPoint> {
-
+    var approxCurve = MatOfPoint2f()
     val grayImage: Mat
     val cannedImage: Mat
     val kernel: Mat = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, Size(9.0, 9.0))
@@ -74,15 +84,64 @@ private fun findContours(src: Mat): ArrayList<MatOfPoint> {
     cannedImage = Mat(size, CvType.CV_8UC1)
     dilate = Mat(size, CvType.CV_8UC1)
 
-    Imgproc.cvtColor(src, grayImage, Imgproc.COLOR_BGR2GRAY)
-    Imgproc.GaussianBlur(grayImage, grayImage, Size(5.0, 5.0), 0.0)
-    Imgproc.threshold(grayImage, grayImage, 20.0, 255.0, Imgproc.THRESH_TRIANGLE)
-    Imgproc.Canny(grayImage, cannedImage, 75.0, 200.0)
-    Imgproc.dilate(cannedImage, dilate, kernel)
+    Imgproc.cvtColor(src, grayImage, Imgproc.COLOR_RGB2GRAY)
+    Imgproc.GaussianBlur(grayImage, grayImage, Size(5.0, 5.0), 1.0)
+
+//    Imgproc.threshold(grayImage, grayImage, 10.0, 100.0, Imgproc.THRESH_BINARY)
+
+    Imgproc.Canny(grayImage, cannedImage, 10.0, 120.0)
+    Imgproc.dilate(cannedImage, dilate, kernel, Point(3.0, 3.0), 1)
+
+//    Imgproc.adaptiveThreshold(grayImage, grayImage, 255.0,
+//        Imgproc.ADAPTIVE_THRESH_GAUSSIAN_C,
+//        Imgproc.THRESH_BINARY,
+//        (src.width() + src.height()) / 200, 1.0)
+
     val contours = ArrayList<MatOfPoint>()
     val hierarchy = Mat()
-    Imgproc.findContours(dilate, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE)
-    contours.sortByDescending { p: MatOfPoint -> Imgproc.contourArea(p) }
+    Imgproc.findContours(
+        dilate.clone(),
+        contours,
+        hierarchy,
+        Imgproc.RETR_TREE,
+        Imgproc.CHAIN_APPROX_SIMPLE
+    )
+
+    for ((index, cnt) in contours.withIndex()) {
+        val curve = MatOfPoint2f(*cnt.toArray())
+        Imgproc.approxPolyDP(curve, approxCurve, 0.1 * Imgproc.arcLength(curve, true), true)
+        val numberVertices = approxCurve!!.total().toInt()
+
+        val contourArea = Imgproc.contourArea(cnt)
+
+        if (Math.abs(contourArea) < 100) {
+            continue
+        }
+
+        //Rectangle detected
+        if (numberVertices >= 4 && numberVertices <= 6) {
+            val cos: MutableList<Double> = java.util.ArrayList()
+            for (j in 2 until numberVertices + 1) {
+                cos.add(
+                    angle(
+                        approxCurve!!.toArray()[j % numberVertices],
+                        approxCurve!!.toArray()[j - 2],
+                        approxCurve!!.toArray()[j - 1]
+                    )
+                )
+            }
+            Collections.sort(cos)
+            val mincos = cos[0]
+            val maxcos = cos[cos.size - 1]
+
+            if (numberVertices == 4 && mincos >= -0.1 && maxcos <= 0.3) {
+
+                Imgproc.drawContours(src, contours, index, Scalar(0.0, 255.0, 0.0), 3)
+//                setLabel(src, "X", cnt)
+            }
+        }
+    }
+
     hierarchy.release()
     grayImage.release()
     cannedImage.release()
@@ -90,6 +149,25 @@ private fun findContours(src: Mat): ArrayList<MatOfPoint> {
     dilate.release()
 
     return contours
+}
+
+private fun setLabel(im: Mat, label: String, contour: MatOfPoint) {
+    val fontface = Core.FONT_HERSHEY_SIMPLEX
+    val scale = 3.0 //0.4;
+    val thickness = 3 //1;
+    val baseline = IntArray(1)
+    val text = Imgproc.getTextSize(label, fontface, scale, thickness, baseline)
+    val r = Imgproc.boundingRect(contour)
+    val pt = Point(r.x + (r.width - text.width) / 2, r.y + (r.height + text.height) / 2)
+    Imgproc.putText(im, label, pt, fontface, scale, Scalar(255.0, 0.0, 0.0), thickness)
+}
+
+private fun angle(pt1: Point, pt2: Point, pt0: Point): Double {
+    val dx1 = pt1.x - pt0.x
+    val dy1 = pt1.y - pt0.y
+    val dx2 = pt2.x - pt0.x
+    val dy2 = pt2.y - pt0.y
+    return (dx1 * dx2 + dy1 * dy2) / Math.sqrt((dx1 * dx1 + dy1 * dy1) * (dx2 * dx2 + dy2 * dy2) + 1e-10)
 }
 
 private fun getCorners(contours: ArrayList<MatOfPoint>, size: Size): Corners? {
@@ -122,6 +200,7 @@ private fun getCorners(contours: ArrayList<MatOfPoint>, size: Size): Corners? {
 }
 
 private fun sortPoints(points: List<Point>): List<Point> {
+
     val p0 = points.minBy { point -> point.x + point.y } ?: Point()
     val p1 = points.minBy { point -> point.y - point.x } ?: Point()
     val p2 = points.maxBy { point -> point.x + point.y } ?: Point()

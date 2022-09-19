@@ -13,6 +13,23 @@ import com.pengke.paper.scanner.processor.Corners
 import com.pengke.paper.scanner.processor.TAG
 import org.opencv.core.Point
 import org.opencv.core.Size
+import java.util.function.BinaryOperator
+import java.util.stream.Collectors
+
+//
+//import android.app.Activity
+//import android.content.Context
+//import android.graphics.*
+//import android.util.AttributeSet
+//import android.util.DisplayMetrics
+//import android.util.Log
+//import android.view.MotionEvent
+//import android.view.View
+//import com.pengke.paper.scanner.SourceManager
+//import com.pengke.paper.scanner.processor.Corners
+//import com.pengke.paper.scanner.processor.TAG
+//import org.opencv.core.Point
+//import org.opencv.core.Size
 
 
 class PaperRectangle : View {

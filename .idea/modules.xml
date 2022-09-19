@@ -2,12 +2,15 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/SmartPaperScan.iml" filepath="$PROJECT_DIR$/SmartPaperScan.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/SmartPaperScan-app.iml" filepath="$PROJECT_DIR$/app/SmartPaperScan-app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/openCVLibrary320/SmartPaperScan-openCVLibrary320.iml" filepath="$PROJECT_DIR$/openCVLibrary320/SmartPaperScan-openCVLibrary320.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/fork-SmartPaperScan.iml" filepath="$PROJECT_DIR$/fork-SmartPaperScan.iml" />
-      <module fileurl="file://$PROJECT_DIR$/openCVLibrary320/openCVLibrary320.iml" filepath="$PROJECT_DIR$/openCVLibrary320/openCVLibrary320.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/SmartPaperScan.iml" filepath="$PROJECT_DIR$/.idea/modules/SmartPaperScan.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SmartPaperScan.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SmartPaperScan.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SmartPaperScan.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SmartPaperScan.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SmartPaperScan.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SmartPaperScan.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/SmartPaperScan.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/SmartPaperScan.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/openCVLibrary320/SmartPaperScan.openCVLibrary320.iml" filepath="$PROJECT_DIR$/.idea/modules/openCVLibrary320/SmartPaperScan.openCVLibrary320.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/openCVLibrary320/SmartPaperScan.openCVLibrary320.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/openCVLibrary320/SmartPaperScan.openCVLibrary320.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/openCVLibrary320/SmartPaperScan.openCVLibrary320.main.iml" filepath="$PROJECT_DIR$/.idea/modules/openCVLibrary320/SmartPaperScan.openCVLibrary320.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/openCVLibrary320/SmartPaperScan.openCVLibrary320.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/openCVLibrary320/SmartPaperScan.openCVLibrary320.unitTest.iml" />
     </modules>
   </component>
 </project>

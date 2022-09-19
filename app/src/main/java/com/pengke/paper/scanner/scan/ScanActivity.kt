@@ -24,6 +24,7 @@ import org.opencv.core.CvType
 import org.opencv.core.Mat
 import org.opencv.core.Size
 import org.opencv.imgcodecs.Imgcodecs
+import org.opencv.imgproc.Imgproc
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -49,13 +50,43 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
             Log.i(TAG, "loading opencv error, exit")
             finish()
         }
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CAMERA_PERMISSION)
-        } else if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
-        } else if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE), REQUEST_CAMERA_PERMISSION)
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    android.Manifest.permission.CAMERA,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ),
+                REQUEST_CAMERA_PERMISSION
+            )
+        } else if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.CAMERA),
+                REQUEST_CAMERA_PERMISSION
+            )
+        } else if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                REQUEST_CAMERA_PERMISSION
+            )
         }
 
         shut.setOnClickListener {
@@ -66,7 +97,10 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
         gallery.setOnClickListener {
             val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
             ActivityCompat.startActivityForResult(this, gallery, 1, null);
-        };
+        }
+
+        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+        ActivityCompat.startActivityForResult(this, gallery, 1, null)
     }
 
 
@@ -96,15 +130,18 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d("MY_LOG", "onActivityResult")
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            Log.d("MY_LOG", "onActivityResult11")
             val uri: Uri = data!!.data;
             val iStream: InputStream = contentResolver.openInputStream(uri)
 
             val exif = ExifInterface(iStream);
             var rotation = -1
             val orientation: Int = exif.getAttributeInt(
-                    ExifInterface.TAG_ORIENTATION,
-                    ExifInterface.ORIENTATION_UNDEFINED)
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_UNDEFINED
+            )
             when (orientation) {
                 ExifInterface.ORIENTATION_ROTATE_90 -> rotation = Core.ROTATE_90_CLOCKWISE
                 ExifInterface.ORIENTATION_ROTATE_180 -> rotation = Core.ROTATE_180
@@ -132,9 +169,15 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         if (requestCode == REQUEST_CAMERA_PERMISSION
-                && (grantResults[permissions.indexOf(android.Manifest.permission.CAMERA)] == PackageManager.PERMISSION_GRANTED)) {
+            && (grantResults[permissions.indexOf(android.Manifest.permission.CAMERA)] == PackageManager.PERMISSION_GRANTED)
+        ) {
+            Log.d("MY_LOG", "onRequestPermissionsResult")
             showMessage(R.string.camera_grant)
             mPresenter.initCamera()
             mPresenter.updateCamera()
@@ -144,7 +187,7 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
 
     override fun getDisplay(): Display = windowManager.defaultDisplay
 
-    override fun getSurfaceView(): SurfaceView = surface
+//    override fun getSurfaceView(): SurfaceView = surface
 
     override fun getPaperRect(): PaperRectangle = paper_rect
 

@@ -8,7 +8,7 @@ interface IScanView {
     interface Proxy {
         fun exit()
         fun getDisplay(): Display
-        fun getSurfaceView(): SurfaceView
+//        fun getSurfaceView(): SurfaceView
         fun getPaperRect(): PaperRectangle
     }
 }
